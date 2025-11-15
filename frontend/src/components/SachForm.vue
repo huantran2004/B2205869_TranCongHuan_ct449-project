@@ -67,13 +67,18 @@
     </div>
     
     <div class="form-group">
-      <label for="MaNXB">Mã nhà xuất bản</label>
+      <label for="MaNXB">Nhà xuất bản <span class="text-danger">*</span></label>
       <Field
         name="MaNXB"
-        type="text"
+        as="select"
         class="form-control"
         v-model="sachLocal.MaNXB"
-      />
+      >
+        <option value="">-- Chọn nhà xuất bản --</option>
+        <option v-for="nxb in nhaXuatBans" :key="nxb.MaNXB" :value="nxb.MaNXB">
+          {{ nxb.MaNXB }} - {{ nxb.TenNXB }}
+        </option>
+      </Field>
       <ErrorMessage name="MaNXB" class="error-feedback" />
     </div>
     
@@ -149,13 +154,14 @@ export default {
         .number()
         .min(1900, "Năm xuất bản phải >= 1900")
         .max(new Date().getFullYear() + 1, "Năm xuất bản không hợp lệ"),
-      MaNXB: yup.string(),
+      MaNXB: yup.string().required("Nhà xuất bản là bắt buộc."),
       NguonGoc: yup.string(),
     });
 
     return {
       sachLocal: { ...this.sach },
       sachFormSchema,
+      nhaXuatBans: [],
     };
   },
   computed: {
@@ -163,7 +169,18 @@ export default {
       return !this.sach._id;
     }
   },
+  async mounted() {
+    await this.loadNhaXuatBan();
+  },
   methods: {
+    async loadNhaXuatBan() {
+      try {
+        const NhaXuatBanService = (await import('@/services/nhaxuatban.service')).default;
+        this.nhaXuatBans = await NhaXuatBanService.getAll();
+      } catch (error) {
+        console.error('Lỗi khi tải danh sách NXB:', error);
+      }
+    },
     submitSach() {
       this.$emit("submit:sach", this.sachLocal);
     },

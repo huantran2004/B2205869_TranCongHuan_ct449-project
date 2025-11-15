@@ -10,8 +10,9 @@ exports.create = async (req, res, next) => {
     const document = await sachService.create(req.body);
     return res.send(document);
   } catch (error) {
+    console.error("Create sach error:", error);
     return next(
-        new ApiError(500, "An error occurred while creating the sach")
+        new ApiError(400, error.message || "An error occurred while creating the sach")
     );
   }
 };
@@ -51,7 +52,8 @@ exports.update = async (req, res, next) => {
     if (!document) return next(new ApiError(404, "Sach not found"));
     return res.send({ message: "Sach was updated successfully" });
   } catch (error) {
-    return next(new ApiError(500, `Error updating sach with id=${req.params.id}`));
+    console.error("Update sach error:", error);
+    return next(new ApiError(400, error.message || `Error updating sach with id=${req.params.id}`));
   }
 };
 

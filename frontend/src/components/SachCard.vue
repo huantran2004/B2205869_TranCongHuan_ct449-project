@@ -5,6 +5,7 @@
       <strong>Mã sách:</strong> {{ sach.MaSach }}<br />
       <strong>Tác giả:</strong> {{ sach.TacGia }}<br />
       <strong>Năm XB:</strong> {{ sach.NamXuatBan }}<br />
+      <strong>Mã NXB:</strong> {{ sach.MaNXB }}<br />
       <strong>Đơn giá:</strong> {{ formatCurrency(sach.DonGia) }}<br />
       <strong>Số quyển:</strong> {{ sach.SoQuyen }}
     </div>
