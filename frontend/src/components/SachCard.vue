@@ -11,7 +11,7 @@
     <div class="mt-2">
       <router-link
         :to="{
-          name: 'sach.edit',
+          name: 'admin.sach.edit',
           params: { id: sach._id },
         }"
         class="btn btn-sm btn-warning"

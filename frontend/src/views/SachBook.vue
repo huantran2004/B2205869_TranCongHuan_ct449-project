@@ -100,7 +100,7 @@ export default {
       }
     },
     goToAddSach() {
-      this.$router.push({ name: "sach.add" });
+      this.$router.push({ name: "admin.sach.add" });
     },
   },
   mounted() {

@@ -47,7 +47,7 @@ export default {
           this.message = "Sách được cập nhật thành công.";
         }
         setTimeout(() => {
-          this.$router.push({ name: "sachbook" });
+          this.$router.push({ name: "admin.sach" });
         }, 1000);
       } catch (error) {
         console.log(error);
@@ -58,7 +58,7 @@ export default {
       if (confirm("Bạn muốn xóa Sách này?")) {
         try {
           await SachService.delete(this.sach._id);
-          this.$router.push({ name: "sachbook" });
+          this.$router.push({ name: "admin.sach" });
         } catch (error) {
           console.log(error);
         }

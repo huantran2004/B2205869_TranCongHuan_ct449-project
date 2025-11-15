@@ -1,11 +1,16 @@
 <template>
   <nav class="navbar navbar-expand navbar-dark bg-dark">
-    <a href="/" class="navbar-brand">Ứng dụng Quản lý mượn sách</a>
+    <router-link to="/" class="navbar-brand">Ứng dụng Quản lý mượn sách</router-link>
     <div class="mr-auto navbar-nav">
-      <li class="nav-item">
-        <router-link :to="{ name: 'sachbook' }" class="nav-link">
-          Danh sách sách
-          <i class="fas fa-book"></i>
+      <!-- Chỉ hiển thị menu khi đã đăng nhập -->
+      <li v-if="isLoggedIn && userType === 'admin'" class="nav-item">
+        <router-link :to="{ name: 'admin.sach' }" class="nav-link">
+          <i class="fas fa-book"></i> Danh sách sách
+        </router-link>
+      </li>
+      <li v-if="isLoggedIn && userType === 'client'" class="nav-item">
+        <router-link :to="{ name: 'client.books' }" class="nav-link">
+          <i class="fas fa-book"></i> Danh sách sách
         </router-link>
       </li>
     </div>

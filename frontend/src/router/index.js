@@ -3,9 +3,9 @@ import SachBook from "@/views/SachBook.vue";
 import HomePage from "@/views/HomePage.vue";
 
 const routes = [
-  // Home
+  // Home - Redirect to login selection page
   {
-    path: "/home",
+    path: "/",
     name: "home",
     component: HomePage,
   },
@@ -99,23 +99,7 @@ const routes = [
     meta: { requiresAuth: true, userType: 'client' }
   },
   
-  // Public Routes (backward compatibility)
-  {
-    path: "/",
-    name: "sachbook",
-    component: SachBook,
-  },
-  {
-    path: "/sach/add",
-    name: "sach.add",
-    component: () => import("@/views/SachEdit.vue"),
-  },
-  {
-    path: "/sach/:id",
-    name: "sach.edit",
-    component: () => import("@/views/SachEdit.vue"),
-    props: true, 
-  },
+  // 404 Not Found
   {
     path: '/:pathMatch(.*)*',       
     name: 'notfound',
