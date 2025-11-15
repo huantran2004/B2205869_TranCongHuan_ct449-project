@@ -15,6 +15,7 @@ class DocGiaService {
       Phai: payload.Phai,
       DiaChi: payload.DiaChi,
       DienThoai: payload.DienThoai,
+      Password: payload.Password,
     };
     Object.keys(docgia).forEach((k) => docgia[k] === undefined && delete docgia[k]);
     return docgia;
@@ -75,6 +76,15 @@ class DocGiaService {
   async deleteAll() {
     const result = await this.DocGia.deleteMany({});
     return result.deletedCount;
+  }
+
+  // Login for DocGia
+  async login(maDocGia, password) {
+    return await this.DocGia.findOne({ MaDocGia: maDocGia, Password: password });
+  }
+
+  async findByMaDocGia(maDocGia) {
+    return await this.DocGia.findOne({ MaDocGia: maDocGia });
   }
 }
 

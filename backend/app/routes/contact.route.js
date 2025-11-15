@@ -8,6 +8,9 @@ router.route("/")
   .post(docgia.create)
   .delete(docgia.deleteAll);
 
+router.route("/login")
+  .post(docgia.login);
+
 router.route("/:id")
   .get(docgia.findOne)
   .put(docgia.update)
