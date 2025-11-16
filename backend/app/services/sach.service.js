@@ -22,19 +22,42 @@ class SachService {
     return sach;
   }
 
+  async generateMaSach() {
+    // Tìm mã sách lớn nhất hiện tại
+    const lastSach = await this.Sach.find()
+      .sort({ MaSach: -1 })
+      .limit(1)
+      .toArray();
+    
+    if (lastSach.length === 0) {
+      return "S001"; // Mã đầu tiên
+    }
+    
+    // Lấy số từ mã cuối cùng (ví dụ: S001 -> 001)
+    const lastMa = lastSach[0].MaSach;
+    const match = lastMa.match(/S(\d+)/);
+    
+    if (match) {
+      const num = parseInt(match[1]) + 1;
+      return `S${num.toString().padStart(3, '0')}`; // S002, S003, ...
+    }
+    
+    return "S001";
+  }
+
   async validateSach(sach, isUpdate = false, currentMaSach = null) {
     const errors = [];
     
-    // Validate Mã sách
-    if (!sach.MaSach) {
+    // Mã sách sẽ được tạo tự động, không cần validate khi tạo mới
+    if (isUpdate && !sach.MaSach) {
       errors.push("Mã sách là bắt buộc");
-    } else {
-      // Kiểm tra trùng Mã sách (chỉ khi tạo mới hoặc đổi mã)
-      if (!isUpdate || (currentMaSach && currentMaSach !== sach.MaSach)) {
-        const existing = await this.Sach.findOne({ MaSach: sach.MaSach });
-        if (existing) {
-          errors.push(`Mã sách "${sach.MaSach}" đã tồn tại`);
-        }
+    }
+    
+    if (isUpdate && sach.MaSach && currentMaSach && currentMaSach !== sach.MaSach) {
+      // Kiểm tra trùng Mã sách khi update và đổi mã
+      const existing = await this.Sach.findOne({ MaSach: sach.MaSach });
+      if (existing) {
+        errors.push(`Mã sách "${sach.MaSach}" đã tồn tại`);
       }
     }
     
@@ -67,7 +90,10 @@ class SachService {
   async create(payload) {
     const sach = this.extractSachData(payload);
     
-    // Validate
+    // Tự động sinh Mã sách
+    sach.MaSach = await this.generateMaSach();
+    
+    // Validate (không cần validate MaSach vì đã tự động sinh)
     const errors = await this.validateSach(sach, false);
     if (errors.length > 0) {
       throw new Error(errors.join(", "));

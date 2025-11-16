@@ -40,7 +40,9 @@ export default {
     async saveSach(data) {
       try {
         if (this.isAddMode) {
-          await SachService.create(data);
+          // Không gửi MaSach khi tạo mới (backend sẽ tự sinh)
+          const { MaSach, ...sachData } = data;
+          await SachService.create(sachData);
           this.message = "Sách được thêm thành công.";
         } else {
           await SachService.update(this.sach._id, data);

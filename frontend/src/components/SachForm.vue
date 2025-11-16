@@ -1,18 +1,20 @@
 <template>
   <Form @submit="submitSach" :validation-schema="sachFormSchema">
-    <div class="form-group">
+    <!-- Mã sách tự động sinh, chỉ hiển thị khi edit -->
+    <div class="form-group" v-if="!isAddMode">
       <label for="MaSach">Mã sách</label>
-      <Field
-        name="MaSach"
+      <input
         type="text"
         class="form-control"
-        v-model="sachLocal.MaSach"
+        :value="sachLocal.MaSach"
+        disabled
+        readonly
       />
-      <ErrorMessage name="MaSach" class="error-feedback" />
+      <small class="form-text text-muted">Mã sách được tạo tự động</small>
     </div>
     
     <div class="form-group">
-      <label for="TenSach">Tên sách</label>
+      <label for="TenSach">Tên sách <span class="text-danger">*</span></label>
       <Field
         name="TenSach"
         type="text"
@@ -131,9 +133,7 @@ export default {
   },
   data() {
     const sachFormSchema = yup.object().shape({
-      MaSach: yup
-        .string()
-        .required("Mã sách là bắt buộc."),
+      // Không validate MaSach vì sẽ tự động sinh
       TenSach: yup
         .string()
         .required("Tên sách là bắt buộc.")
