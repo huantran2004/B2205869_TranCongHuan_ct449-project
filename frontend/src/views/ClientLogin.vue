@@ -98,6 +98,9 @@ export default {
           this.credentials.Password
         );
 
+        // Xóa hết localStorage cũ trước khi lưu mới
+        localStorage.clear();
+        
         // Lưu thông tin client vào localStorage
         localStorage.setItem("client", JSON.stringify(response));
         localStorage.setItem("userType", "client");

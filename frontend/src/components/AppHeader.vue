@@ -92,11 +92,14 @@ export default {
   methods: {
     logout() {
       if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        // Lưu userType TRƯỚC KHI xóa localStorage
+        const currentUserType = this.userType;
+        
         localStorage.removeItem('admin');
         localStorage.removeItem('client');
         localStorage.removeItem('userType');
         
-        const loginRoute = this.userType === 'admin' 
+        const loginRoute = currentUserType === 'admin' 
           ? { name: 'admin.login' }
           : { name: 'client.login' };
         
