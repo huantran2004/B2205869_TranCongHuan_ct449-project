@@ -115,6 +115,10 @@ export default {
       }
     },
   },
+  created() {
+    // Xóa localStorage khi vào trang login để AppHeader hiển thị đúng
+    localStorage.clear();
+  },
 };
 </script>
 
