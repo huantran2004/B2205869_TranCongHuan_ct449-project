@@ -15,7 +15,7 @@
         <h3>Xin chào, {{ docgia.HoLot }} {{ docgia.Ten }}!</h3>
         <p>Mã độc giả: {{ docgia.MaDocGia }}</p>
         <p>Ngày sinh: {{ formatDate(docgia.NgaySinh) }}</p>
-        <p>Giới tính: {{ docgia.Phai }}</p>
+        <p>Giới tính: {{ docgia.Phai === 0 ? 'Nam' : 'Nữ' }}</p>
         <p>Địa chỉ: {{ docgia.DiaChi }}</p>
         <p>Điện thoại: {{ docgia.DienThoai }}</p>
       </div>

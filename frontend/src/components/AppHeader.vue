@@ -57,16 +57,31 @@ export default {
       return localStorage.getItem('userType');
     },
     userTypeLabel() {
-      return this.userType === 'admin' ? 'Admin' : 'Độc giả';
+      return this.userType === 'admin' ? 'Quản trị viên' : 'Độc giả';
     },
     userName() {
       if (this.userType === 'admin') {
-        const admin = JSON.parse(localStorage.getItem('admin') || '{}');
-        return admin.HoTenNV || 'Admin';
-      } else {
-        const client = JSON.parse(localStorage.getItem('client') || '{}');
-        return `${client.HoLot || ''} ${client.Ten || ''}`.trim() || 'Độc giả';
+        const adminData = localStorage.getItem('admin');
+        if (!adminData) return 'Admin';
+        try {
+          const admin = JSON.parse(adminData);
+          return admin.HoTenNV || 'Admin';
+        } catch (e) {
+          return 'Admin';
+        }
+      } else if (this.userType === 'client') {
+        const clientData = localStorage.getItem('client');
+        if (!clientData) return 'Độc giả';
+        try {
+          const client = JSON.parse(clientData);
+          const hoLot = client.HoLot || '';
+          const ten = client.Ten || '';
+          return `${hoLot} ${ten}`.trim() || 'Độc giả';
+        } catch (e) {
+          return 'Độc giả';
+        }
       }
+      return 'Người dùng';
     },
     dashboardRoute() {
       return this.userType === 'admin' 
