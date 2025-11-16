@@ -132,6 +132,12 @@ router.beforeEach((to, from, next) => {
       alert('Bạn không có quyền truy cập trang này!');
       next(false);
     } else {
+      // Xóa localStorage của user type khác để tránh xung đột
+      if (requiredType === 'admin') {
+        localStorage.removeItem('client');
+      } else if (requiredType === 'client') {
+        localStorage.removeItem('admin');
+      }
       next();
     }
   } else {

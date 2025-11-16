@@ -32,6 +32,10 @@ class TheoDoiMuonSachService {
     async getChuaTra() {
         return (await this.api.get("/chuatra")).data;
     }
+
+    async traSach(id) {
+        return (await this.api.put(`/${id}/trasach`)).data;
+    }
 }
 
 export default new TheoDoiMuonSachService();

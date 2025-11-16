@@ -19,6 +19,23 @@ class TheoDoiMuonSachService {
 
   async create(payload) {
     const theodoi = this.extractTheoDoiMuonSachData(payload);
+    
+    // Tự động set NgayMuon là ngày hiện tại nếu không có
+    if (!theodoi.NgayMuon) {
+      theodoi.NgayMuon = new Date();
+    } else {
+      // Đảm bảo NgayMuon là Date object
+      theodoi.NgayMuon = new Date(theodoi.NgayMuon);
+    }
+    
+    // Tự động tính NgayTra = NgayMuon + 14 ngày (luôn ghi đè)
+    const ngayTraDuKien = new Date(theodoi.NgayMuon);
+    ngayTraDuKien.setDate(ngayTraDuKien.getDate() + 14);
+    theodoi.NgayTraDuKien = ngayTraDuKien;
+    
+    // NgayTra thực tế để null (chưa trả)
+    theodoi.NgayTra = null;
+    
     const result = await this.TheoDoiMuonSach.insertOne(theodoi);
     return { _id: result.insertedId, ...theodoi };
   }
@@ -72,6 +89,17 @@ class TheoDoiMuonSachService {
       filter.MaDocGia = maDocGia;
     }
     return await this.find(filter);
+  }
+  
+  // Cập nhật NgayTra khi trả sách
+  async traSach(id) {
+    const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const result = await this.TheoDoiMuonSach.findOneAndUpdate(
+      filter,
+      { $set: { NgayTra: new Date() } },
+      { returnDocument: "after" }
+    );
+    return result.value;
   }
 }
 

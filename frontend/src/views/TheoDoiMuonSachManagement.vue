@@ -81,16 +81,23 @@
                 <th>Mã ĐG</th>
                 <th>Mã Sách</th>
                 <th>Ngày mượn</th>
-                <th>Ngày trả</th>
+                <th>Ngày trả dự kiến</th>
+                <th>Ngày trả thực tế</th>
                 <th>Trạng thái</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in filteredList" :key="item._id">
+              <tr v-for="item in filteredList" :key="item._id" :class="{ 'table-danger': isOverdue(item) }">
                 <td>{{ item.MaDocGia }}</td>
                 <td>{{ item.MaSach }}</td>
                 <td>{{ formatDate(item.NgayMuon) }}</td>
+                <td>
+                  <strong class="text-primary">{{ formatDate(item.NgayTraDuKien) }}</strong>
+                  <span v-if="isOverdue(item)" class="badge badge-danger ml-2">
+                    <i class="fas fa-exclamation-triangle"></i> Quá hạn
+                  </span>
+                </td>
                 <td>
                   <span v-if="item.NgayTra">{{ formatDate(item.NgayTra) }}</span>
                   <span v-else class="text-muted">Chưa trả</span>
@@ -98,6 +105,9 @@
                 <td>
                   <span v-if="item.NgayTra" class="badge badge-success">
                     <i class="fas fa-check"></i> Đã trả
+                  </span>
+                  <span v-else-if="isOverdue(item)" class="badge badge-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Quá hạn
                   </span>
                   <span v-else class="badge badge-warning">
                     <i class="fas fa-clock"></i> Chưa trả
@@ -185,6 +195,9 @@
                   v-model="formData.NgayMuon"
                 />
                 <ErrorMessage name="NgayMuon" class="invalid-feedback" />
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Ngày trả dự kiến sẽ tự động được tính là <strong>14 ngày</strong> sau ngày mượn
+                </small>
               </div>
 
               <div class="modal-footer">
@@ -322,9 +335,8 @@ export default {
     async confirmTraSach(item) {
       if (confirm(`Xác nhận trả sách "${item.MaSach}"?`)) {
         try {
-          await TheoDoiMuonSachService.update(item._id, {
-            NgayTra: new Date().toISOString(),
-          });
+          // Sử dụng endpoint mới để trả sách
+          await TheoDoiMuonSachService.traSach(item._id);
           alert('Cập nhật trả sách thành công!');
           this.loadAll();
         } catch (error) {
@@ -332,6 +344,13 @@ export default {
           alert('Không thể cập nhật: ' + (error.response?.data?.message || error.message));
         }
       }
+    },
+    isOverdue(item) {
+      // Kiểm tra xem sách có quá hạn không
+      if (item.NgayTra || !item.NgayTraDuKien) return false;
+      const today = new Date();
+      const dueDate = new Date(item.NgayTraDuKien);
+      return today > dueDate;
     },
     async confirmDelete(item) {
       if (confirm(`Bạn có chắc muốn xóa phiếu mượn này?`)) {

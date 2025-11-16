@@ -49,27 +49,40 @@
 
 <script>
 export default {
+  data() {
+    return {
+      // Force reactive update key
+      updateKey: 0
+    };
+  },
   computed: {
     isLoggedIn() {
+      // Access updateKey to make this reactive
+      this.updateKey;
       return !!localStorage.getItem('userType');
     },
     userType() {
+      // Access updateKey to make this reactive
+      this.updateKey;
       return localStorage.getItem('userType');
     },
     userTypeLabel() {
       return this.userType === 'admin' ? 'Quản trị viên' : 'Độc giả';
     },
     userName() {
-      if (this.userType === 'admin') {
+      const userType = this.userType;
+      
+      if (userType === 'admin') {
         const adminData = localStorage.getItem('admin');
         if (!adminData) return 'Admin';
         try {
           const admin = JSON.parse(adminData);
           return admin.HoTenNV || 'Admin';
         } catch (e) {
+          console.error('Error parsing admin data:', e);
           return 'Admin';
         }
-      } else if (this.userType === 'client') {
+      } else if (userType === 'client') {
         const clientData = localStorage.getItem('client');
         if (!clientData) return 'Độc giả';
         try {
@@ -78,6 +91,7 @@ export default {
           const ten = client.Ten || '';
           return `${hoLot} ${ten}`.trim() || 'Độc giả';
         } catch (e) {
+          console.error('Error parsing client data:', e);
           return 'Độc giả';
         }
       }
@@ -87,6 +101,12 @@ export default {
       return this.userType === 'admin' 
         ? { name: 'admin.dashboard' }
         : { name: 'client.dashboard' };
+    }
+  },
+  watch: {
+    // Watch route changes to update user info
+    '$route'() {
+      this.updateKey++;
     }
   },
   methods: {

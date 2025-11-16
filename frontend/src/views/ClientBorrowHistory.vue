@@ -57,15 +57,22 @@
               <tr>
                 <th>Mã Sách</th>
                 <th>Ngày mượn</th>
-                <th>Ngày trả</th>
+                <th>Ngày trả dự kiến</th>
+                <th>Ngày trả thực tế</th>
                 <th>Trạng thái</th>
                 <th>Thời gian mượn</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in filteredHistory" :key="item._id">
+              <tr v-for="item in filteredHistory" :key="item._id" :class="{ 'table-danger': isOverdue(item) }">
                 <td>{{ item.MaSach }}</td>
                 <td>{{ formatDate(item.NgayMuon) }}</td>
+                <td>
+                  <strong class="text-primary">{{ formatDate(item.NgayTraDuKien) }}</strong>
+                  <span v-if="isOverdue(item)" class="badge badge-danger ml-2">
+                    <i class="fas fa-exclamation-triangle"></i> Quá hạn
+                  </span>
+                </td>
                 <td>
                   <span v-if="item.NgayTra">{{ formatDate(item.NgayTra) }}</span>
                   <span v-else class="text-muted">Chưa trả</span>
@@ -74,7 +81,7 @@
                   <span v-if="item.NgayTra" class="badge badge-success">
                     <i class="fas fa-check"></i> Đã trả
                   </span>
-                  <span v-else-if="isOverdue(item.NgayMuon)" class="badge badge-danger">
+                  <span v-else-if="isOverdue(item)" class="badge badge-danger">
                     <i class="fas fa-exclamation-triangle"></i> Quá hạn
                   </span>
                   <span v-else class="badge badge-warning">
@@ -200,10 +207,12 @@ export default {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return diffDays;
     },
-    isOverdue(borrowDate) {
-      const maxDays = 30; // Quy định mượn tối đa 30 ngày
-      const days = this.calculateDays(borrowDate, null);
-      return days > maxDays;
+    isOverdue(item) {
+      // Kiểm tra xem sách có quá hạn không dựa vào NgayTraDuKien
+      if (item.NgayTra || !item.NgayTraDuKien) return false;
+      const today = new Date();
+      const dueDate = new Date(item.NgayTraDuKien);
+      return today > dueDate;
     },
   },
 };

@@ -11,6 +11,9 @@ router.route("/")
 router.route("/chuatra")
   .get(theodoimuonsach.findChuaTra);
 
+router.route("/:id/trasach")
+  .put(theodoimuonsach.traSach);
+
 router.route("/:id")
   .get(theodoimuonsach.findOne)
   .put(theodoimuonsach.update)
