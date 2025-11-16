@@ -57,8 +57,7 @@
               <tr>
                 <th>Mã Sách</th>
                 <th>Ngày mượn</th>
-                <th>Ngày trả dự kiến</th>
-                <th>Ngày trả thực tế</th>
+                <th>Ngày trả (Dự kiến/Thực tế)</th>
                 <th>Trạng thái</th>
                 <th>Thời gian mượn</th>
               </tr>
@@ -68,27 +67,29 @@
                 <td>{{ item.MaSach }}</td>
                 <td>{{ formatDate(item.NgayMuon) }}</td>
                 <td>
-                  <strong class="text-primary">{{ formatDate(item.NgayTraDuKien) }}</strong>
+                  <strong :class="item.TrangThai === 'Đã trả' ? 'text-success' : 'text-primary'">
+                    {{ formatDate(item.NgayTra) }}
+                  </strong>
                   <span v-if="isOverdue(item)" class="badge badge-danger ml-2">
                     <i class="fas fa-exclamation-triangle"></i> Quá hạn
                   </span>
+                  <br>
+                  <small class="text-muted">
+                    {{ item.TrangThai === 'Đã trả' ? '(Ngày trả thực tế)' : '(Ngày trả dự kiến)' }}
+                  </small>
                 </td>
                 <td>
-                  <span v-if="item.NgayTra">{{ formatDate(item.NgayTra) }}</span>
-                  <span v-else class="text-muted">Chưa trả</span>
-                </td>
-                <td>
-                  <span v-if="item.NgayTra" class="badge badge-success">
+                  <span v-if="item.TrangThai === 'Chờ duyệt'" class="badge badge-info">
+                    <i class="fas fa-hourglass-half"></i> Chờ duyệt
+                  </span>
+                  <span v-else-if="item.TrangThai === 'Đã duyệt'" class="badge badge-warning">
+                    <i class="fas fa-book-open"></i> Đang mượn
+                  </span>
+                  <span v-else-if="item.TrangThai === 'Đã trả'" class="badge badge-success">
                     <i class="fas fa-check"></i> Đã trả
                   </span>
-                  <span v-else-if="isOverdue(item)" class="badge badge-danger">
-                    <i class="fas fa-exclamation-triangle"></i> Quá hạn
-                  </span>
-                  <span v-else class="badge badge-warning">
-                    <i class="fas fa-clock"></i> Đang mượn
-                  </span>
                 </td>
-                <td>{{ calculateDays(item.NgayMuon, item.NgayTra) }} ngày</td>
+                <td>{{ calculateDays(item.NgayMuon, item.TrangThai === 'Đã trả' ? item.NgayTra : null) }} ngày</td>
               </tr>
             </tbody>
           </table>
@@ -190,9 +191,9 @@ export default {
       if (filterType === 'all') {
         this.filteredHistory = this.history;
       } else if (filterType === 'dangmuon') {
-        this.filteredHistory = this.history.filter(item => !item.NgayTra);
+        this.filteredHistory = this.history.filter(item => item.TrangThai === 'Đã duyệt');
       } else if (filterType === 'datra') {
-        this.filteredHistory = this.history.filter(item => item.NgayTra);
+        this.filteredHistory = this.history.filter(item => item.TrangThai === 'Đã trả');
       }
     },
     formatDate(dateString) {
@@ -208,10 +209,16 @@ export default {
       return diffDays;
     },
     isOverdue(item) {
-      // Kiểm tra xem sách có quá hạn không dựa vào NgayTraDuKien
-      if (item.NgayTra || !item.NgayTraDuKien) return false;
+      // Kiểm tra xem sách có quá hạn không
+      if (item.TrangThai !== 'Đã duyệt') return false; // Chỉ check quá hạn với sách đang mượn
+      if (!item.NgayTra) return false;
+      
       const today = new Date();
-      const dueDate = new Date(item.NgayTraDuKien);
+      today.setHours(0, 0, 0, 0);
+      
+      const dueDate = new Date(item.NgayTra);
+      dueDate.setHours(0, 0, 0, 0);
+      
       return today > dueDate;
     },
   },

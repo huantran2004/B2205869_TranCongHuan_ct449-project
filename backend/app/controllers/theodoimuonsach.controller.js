@@ -93,6 +93,17 @@ exports.deleteAll = async (_req, res, next) => {
   }
 };
 
+exports.duyetMuonSach = async (req, res, next) => {
+  try {
+    const tdmsService = new TheoDoiMuonSachService(MongoDB.client);
+    const document = await tdmsService.duyetMuonSach(req.params.id);
+    if (!document) return next(new ApiError(404, "Theo doi muon sach not found"));
+    return res.send({ message: "Duyệt yêu cầu mượn sách thành công", data: document });
+  } catch (error) {
+    return next(new ApiError(500, `Error approving borrow request with id=${req.params.id}`));
+  }
+};
+
 exports.traSach = async (req, res, next) => {
   try {
     const tdmsService = new TheoDoiMuonSachService(MongoDB.client);

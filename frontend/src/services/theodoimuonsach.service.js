@@ -33,6 +33,10 @@ class TheoDoiMuonSachService {
         return (await this.api.get("/chuatra")).data;
     }
 
+    async duyetMuonSach(id) {
+        return (await this.api.put(`/${id}/duyet`)).data;
+    }
+
     async traSach(id) {
         return (await this.api.put(`/${id}/trasach`)).data;
     }

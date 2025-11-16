@@ -12,6 +12,8 @@ class TheoDoiMuonSachService {
       MaSach: payload.MaSach,
       NgayMuon: payload.NgayMuon,
       NgayTra: payload.NgayTra,
+      // Thêm field TrangThai để quản lý workflow (không làm mất 4 field gốc)
+      TrangThai: payload.TrangThai,
     };
     Object.keys(theodoi).forEach((k) => theodoi[k] === undefined && delete theodoi[k]);
     return theodoi;
@@ -24,17 +26,17 @@ class TheoDoiMuonSachService {
     if (!theodoi.NgayMuon) {
       theodoi.NgayMuon = new Date();
     } else {
-      // Đảm bảo NgayMuon là Date object
       theodoi.NgayMuon = new Date(theodoi.NgayMuon);
     }
     
-    // Tự động tính NgayTra = NgayMuon + 14 ngày (luôn ghi đè)
+    // NgayTra = NgayMuon + 14 ngày (Ngày trả DỰ KIẾN theo quy định)
+    // Khi trả sách thực tế, sẽ update lại NgayTra thành ngày trả thực tế
     const ngayTraDuKien = new Date(theodoi.NgayMuon);
     ngayTraDuKien.setDate(ngayTraDuKien.getDate() + 14);
-    theodoi.NgayTraDuKien = ngayTraDuKien;
+    theodoi.NgayTra = ngayTraDuKien;
     
-    // NgayTra thực tế để null (chưa trả)
-    theodoi.NgayTra = null;
+    // Trạng thái ban đầu là "Chờ duyệt"
+    theodoi.TrangThai = "Chờ duyệt";
     
     const result = await this.TheoDoiMuonSach.insertOne(theodoi);
     return { _id: result.insertedId, ...theodoi };
@@ -82,21 +84,37 @@ class TheoDoiMuonSachService {
     return result.deletedCount;
   }
 
-  // Tìm sách chưa trả (NgayTra = null hoặc không có)
+  // Tìm sách chưa trả (TrangThai != "Đã trả")
   async findChuaTra(maDocGia = null) {
-    const filter = { $or: [{ NgayTra: null }, { NgayTra: { $exists: false } }] };
+    const filter = { TrangThai: { $ne: "Đã trả" } };
     if (maDocGia) {
       filter.MaDocGia = maDocGia;
     }
     return await this.find(filter);
   }
   
-  // Cập nhật NgayTra khi trả sách
+  // Duyệt yêu cầu mượn sách (Admin)
+  async duyetMuonSach(id) {
+    const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const result = await this.TheoDoiMuonSach.findOneAndUpdate(
+      filter,
+      { $set: { TrangThai: "Đã duyệt" } },
+      { returnDocument: "after" }
+    );
+    return result.value;
+  }
+  
+  // Cập nhật NgayTra khi trả sách (Admin)
   async traSach(id) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
       filter,
-      { $set: { NgayTra: new Date() } },
+      { 
+        $set: { 
+          NgayTra: new Date(),  // Cập nhật ngày trả THỰC TẾ
+          TrangThai: "Đã trả" 
+        } 
+      },
       { returnDocument: "after" }
     );
     return result.value;
