@@ -45,12 +45,11 @@ class DocGiaService {
       docgia.MaDocGia = await this.generateMaDocGia();
     }
     
-    const result = await this.DocGia.findOneAndUpdate(
-      { MaDocGia: docgia.MaDocGia },
-      { $set: docgia },
-      { returnDocument: "after", upsert: true }
-    );
-    return result.value;
+    // Insert document mới
+    await this.DocGia.insertOne(docgia);
+    
+    // Trả về document vừa tạo
+    return docgia;
   }
 
   async find(filter = {}) {
