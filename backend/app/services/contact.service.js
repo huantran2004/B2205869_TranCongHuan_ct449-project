@@ -21,8 +21,30 @@ class DocGiaService {
     return docgia;
   }
 
+  async generateMaDocGia() {
+    // Tìm MaDocGia lớn nhất hiện tại
+    const lastDocGia = await this.DocGia.find()
+      .sort({ MaDocGia: -1 })
+      .limit(1)
+      .toArray();
+    
+    if (lastDocGia.length === 0) {
+      return "DG001"; // Mã độc giả đầu tiên
+    }
+    
+    const lastMa = lastDocGia[0].MaDocGia;
+    const number = parseInt(lastMa.substring(2)) + 1; // Lấy số sau "DG"
+    return "DG" + number.toString().padStart(3, "0"); // DG001, DG002, ...
+  }
+
   async create(payload) {
     const docgia = this.extractDocGiaData(payload);
+    
+    // Auto-generate MaDocGia nếu không có
+    if (!docgia.MaDocGia) {
+      docgia.MaDocGia = await this.generateMaDocGia();
+    }
+    
     const result = await this.DocGia.findOneAndUpdate(
       { MaDocGia: docgia.MaDocGia },
       { $set: docgia },

@@ -109,20 +109,28 @@
           <div class="modal-body">
             <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors }">
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6" v-if="isEditing">
                   <div class="form-group">
-                    <label>Mã Độc Giả <span class="text-danger">*</span></label>
-                    <Field
-                      name="MaDocGia"
+                    <label>Mã Độc Giả</label>
+                    <input
                       type="text"
                       class="form-control"
-                      :class="{ 'is-invalid': errors.MaDocGia }"
                       v-model="formData.MaDocGia"
-                      :disabled="isEditing"
+                      disabled
+                      readonly
                     />
-                    <ErrorMessage name="MaDocGia" class="invalid-feedback" />
+                    <small class="form-text text-muted">Mã tự động (không thể sửa)</small>
                   </div>
                 </div>
+                <div :class="isEditing ? 'col-md-6' : 'col-md-12'">
+                  <div class="alert alert-info" v-if="!isEditing">
+                    <i class="fas fa-info-circle"></i> 
+                    Mã độc giả sẽ được tạo tự động (DG001, DG002, ...)
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
                     <label>Họ Lót <span class="text-danger">*</span></label>
@@ -284,7 +292,9 @@ export default {
     schema() {
       // Dynamic schema based on isEditing
       return yup.object({
-        MaDocGia: yup.string().required('Mã độc giả là bắt buộc'),
+        MaDocGia: this.isEditing 
+          ? yup.string().required('Mã độc giả là bắt buộc')
+          : yup.string().notRequired(), // Không bắt buộc khi thêm mới (auto-generate)
         HoLot: yup.string().required('Họ lót là bắt buộc'),
         Ten: yup.string().required('Tên là bắt buộc'),
         NgaySinh: yup.date().required('Ngày sinh là bắt buộc'),
@@ -360,12 +370,15 @@ export default {
       try {
         const submitData = { ...this.formData };
         if (this.isEditing) {
+          // Khi sửa: Xóa Password (giữ nguyên password cũ)
           delete submitData.Password;
           await DocGiaService.update(this.editingId, submitData);
           alert('Cập nhật độc giả thành công!');
         } else {
-          await DocGiaService.create(submitData);
-          alert('Thêm độc giả thành công!');
+          // Khi thêm: Xóa MaDocGia (để backend auto-generate)
+          delete submitData.MaDocGia;
+          const result = await DocGiaService.create(submitData);
+          alert(`Thêm độc giả thành công!\nMã độc giả: ${result.MaDocGia}`);
         }
         // jQuery global để đóng modal (Bootstrap 4)
         window.$('#docGiaModal').modal('hide');
