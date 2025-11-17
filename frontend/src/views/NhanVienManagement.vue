@@ -109,21 +109,30 @@
           <div class="modal-body">
             <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors }">
               <div class="row">
-                <div class="col-md-6">
+                <!-- Thông báo auto-generate MSNV khi thêm mới -->
+                <div class="col-12" v-if="!isEditing">
+                  <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    Mã nhân viên sẽ được tạo tự động (NV001, NV002, ...)
+                  </div>
+                </div>
+                
+                <!-- Chỉ hiển thị MSNV khi đang sửa (readonly) -->
+                <div class="col-md-6" v-if="isEditing">
                   <div class="form-group">
-                    <label>MSNV <span class="text-danger">*</span></label>
+                    <label>MSNV</label>
                     <Field
                       name="MSNV"
                       type="text"
                       class="form-control"
                       :class="{ 'is-invalid': errors.MSNV }"
                       v-model="formData.MSNV"
-                      :disabled="isEditing"
+                      readonly
                     />
                     <ErrorMessage name="MSNV" class="invalid-feedback" />
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div :class="isEditing ? 'col-md-6' : 'col-md-12'">
                   <div class="form-group">
                     <label>Họ Tên <span class="text-danger">*</span></label>
                     <Field
@@ -233,19 +242,6 @@ export default {
     ErrorMessage,
   },
   data() {
-    const schema = yup.object({
-      MSNV: yup.string().required('MSNV là bắt buộc'),
-      HoTenNV: yup.string().required('Họ tên là bắt buộc'),
-      ChucVu: yup.string().required('Chức vụ là bắt buộc'),
-      DiaChi: yup.string().required('Địa chỉ là bắt buộc'),
-      SoDienThoai: yup.string().required('Số điện thoại là bắt buộc'),
-      Password: yup.string().when('$isEditing', {
-        is: false,
-        then: (schema) => schema.required('Mật khẩu là bắt buộc').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    });
-
     return {
       nhanVienList: [],
       filteredNhanVien: [],
@@ -261,8 +257,26 @@ export default {
         Password: '',
       },
       editingId: null,
-      schema,
+      schema: null, // Sẽ được set trong computed
     };
+  },
+  computed: {
+    schema() {
+      return yup.object({
+        // MSNV chỉ bắt buộc khi đang sửa
+        MSNV: this.isEditing 
+          ? yup.string().required('MSNV là bắt buộc')
+          : yup.string().notRequired(),
+        HoTenNV: yup.string().required('Họ tên là bắt buộc'),
+        ChucVu: yup.string().required('Chức vụ là bắt buộc'),
+        DiaChi: yup.string().required('Địa chỉ là bắt buộc'),
+        SoDienThoai: yup.string().required('Số điện thoại là bắt buộc'),
+        // Password chỉ bắt buộc khi thêm mới
+        Password: this.isEditing
+          ? yup.string().notRequired()
+          : yup.string().required('Mật khẩu là bắt buộc').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+      });
+    },
   },
   mounted() {
     this.loadNhanVien();
@@ -322,12 +336,15 @@ export default {
       try {
         const submitData = { ...this.formData };
         if (this.isEditing) {
+          // Khi sửa: Xóa Password (giữ nguyên password cũ)
           delete submitData.Password;
           await NhanVienService.update(this.editingId, submitData);
           alert('Cập nhật nhân viên thành công!');
         } else {
-          await NhanVienService.create(submitData);
-          alert('Thêm nhân viên thành công!');
+          // Khi thêm: Xóa MSNV (để backend auto-generate)
+          delete submitData.MSNV;
+          const result = await NhanVienService.create(submitData);
+          alert(`Thêm nhân viên thành công!\nMã nhân viên: ${result.MSNV}`);
         }
         window.$('#nhanVienModal').modal('hide');
         this.loadNhanVien();

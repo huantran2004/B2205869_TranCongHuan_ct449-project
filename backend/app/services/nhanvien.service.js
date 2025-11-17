@@ -19,14 +19,33 @@ class NhanVienService {
     return nhanvien;
   }
 
+  // Auto-generate MSNV (NV001, NV002, NV003...)
+  async generateMSNV() {
+    const lastNhanVien = await this.NhanVien.find()
+      .sort({ MSNV: -1 })
+      .limit(1)
+      .toArray();
+    
+    if (lastNhanVien.length === 0) return "NV001";
+    
+    const lastMa = lastNhanVien[0].MSNV;
+    const number = parseInt(lastMa.substring(2)) + 1; // Lấy số sau "NV"
+    return "NV" + number.toString().padStart(3, "0"); // NV001, NV002, ...
+  }
+
   async create(payload) {
     const nhanvien = this.extractNhanVienData(payload);
-    const result = await this.NhanVien.findOneAndUpdate(
-      { MSNV: nhanvien.MSNV },
-      { $set: nhanvien },
-      { returnDocument: "after", upsert: true }
-    );
-    return result.value;
+    
+    // Auto-generate MSNV nếu không có
+    if (!nhanvien.MSNV) {
+      nhanvien.MSNV = await this.generateMSNV();
+    }
+    
+    // Insert document mới
+    await this.NhanVien.insertOne(nhanvien);
+    
+    // Trả về document vừa tạo
+    return nhanvien;
   }
 
   async find(filter = {}) {
@@ -53,6 +72,12 @@ class NhanVienService {
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
     const update = this.extractNhanVienData(payload);
+    
+    // Không xóa password nếu không được cung cấp
+    if (!payload.Password) {
+      delete update.Password;
+    }
+    
     const result = await this.NhanVien.findOneAndUpdate(
       filter,
       { $set: update },
