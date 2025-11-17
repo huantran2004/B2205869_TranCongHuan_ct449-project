@@ -2,9 +2,15 @@
   <div class="login-container">
     <div class="login-card">
       <div class="login-header">
-        <i class="fas fa-user-shield fa-3x"></i>
-        <h2>Đăng nhập Admin</h2>
-        <p>Quản lý hệ thống mượn sách</p>
+        <i class="fas fa-user-shield fa-3x text-danger"></i>
+        <h2>🔒 Khu vực Quản trị</h2>
+        <p class="text-muted">Chỉ dành cho nhân viên thư viện</p>
+        <div class="alert alert-warning mt-3 py-2">
+          <small>
+            <i class="fas fa-exclamation-triangle"></i> 
+            <strong>BẢO MẬT:</strong> Trang này không công khai
+          </small>
+        </div>
       </div>
 
       <Form @submit="handleLogin" :validation-schema="loginSchema">
@@ -40,17 +46,13 @@
           {{ errorMessage }}
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
+        <button type="submit" class="btn btn-danger btn-block" :disabled="loading">
           <i class="fas fa-sign-in-alt"></i>
-          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          {{ loading ? 'Đang xác thực...' : 'Đăng nhập Admin' }}
         </button>
       </Form>
 
-      <div class="login-footer">
-        <p>Bạn là độc giả? 
-          <router-link to="/client/login">Đăng nhập tại đây</router-link>
-        </p>
-      </div>
+      <!-- XÓA LINK ĐẾN CLIENT LOGIN (Bảo mật) -->
     </div>
   </div>
 </template>

@@ -15,15 +15,10 @@
       </li>
     </div>
     <div class="navbar-nav ml-auto">
-      <!-- Nếu chưa đăng nhập -->
-      <li v-if="!isLoggedIn" class="nav-item">
-        <router-link :to="{ name: 'admin.login' }" class="nav-link">
-          <i class="fas fa-sign-in-alt"></i> Đăng nhập Admin
-        </router-link>
-      </li>
+      <!-- Nếu chưa đăng nhập - CHỈ HIỂN THỊ LOGIN CLIENT (Bảo mật Admin) -->
       <li v-if="!isLoggedIn" class="nav-item">
         <router-link :to="{ name: 'client.login' }" class="nav-link">
-          <i class="fas fa-sign-in-alt"></i> Đăng nhập Độc giả
+          <i class="fas fa-sign-in-alt"></i> Đăng nhập
         </router-link>
       </li>
       

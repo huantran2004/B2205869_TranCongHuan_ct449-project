@@ -2,6 +2,18 @@
   <div class="page row">
     <div class="col-md-10">
       <InputSearch v-model="searchText" />
+      
+      <!-- AI Voice Search -->
+      <div class="mt-3">
+        <VoiceSearch 
+          @search="handleVoiceSearch"
+          @transcript-change="handleTranscriptChange"
+          :auto-search="true"
+          lang="vi-VN"
+          idle-text="🎤 Tìm sách bằng giọng nói (AI)"
+          listening-text="🎙️ Đang nghe..."
+        />
+      </div>
     </div>
     <div class="col-md-2">
       <button class="btn btn-sm btn-success" @click="goToAddSach">
@@ -37,12 +49,14 @@
 <script>
 import SachList from "@/components/SachList.vue";
 import InputSearch from "@/components/InputSearch.vue";
+import VoiceSearch from "@/components/VoiceSearch.vue";
 import SachService from "@/services/sach.service";
 
 export default {
   components: {
     SachList,
     InputSearch,
+    VoiceSearch,
   },
   data() {
     return {
@@ -101,6 +115,17 @@ export default {
     },
     goToAddSach() {
       this.$router.push({ name: "admin.sach.add" });
+    },
+    
+    // AI Voice Search Methods
+    handleVoiceSearch(transcript) {
+      // Update search text with voice transcript
+      this.searchText = transcript;
+    },
+    
+    handleTranscriptChange(transcript) {
+      // Optional: Update search text as user speaks
+      this.searchText = transcript;
     },
   },
   mounted() {

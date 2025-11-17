@@ -2,6 +2,25 @@
 
 Ứng dụng full-stack quản lý thư viện với Backend sử dụng NodeJS/ExpressJS và Frontend sử dụng VueJS.
 
+## ✨ **TÍNH NĂNG MỚI: AI VOICE SEARCH (TÌM KIẾM BẰNG GIỌNG NÓI)**
+
+🎤 Hệ thống đã tích hợp **AI Voice Search** sử dụng Web Speech API!
+
+**Tính năng:**
+- 🎙️ Nhận diện giọng nói tiếng Việt
+- 🔊 Phản hồi bằng giọng nói (Text-to-Speech)
+- 🔍 Tự động tìm kiếm sách
+- 🎨 Giao diện đẹp với animation
+
+**Hỗ trợ:**
+- ✅ Chrome, Edge, Safari
+- ✅ Tiếng Việt (vi-VN)
+- ✅ Mobile-friendly
+
+📖 **Xem hướng dẫn chi tiết:** [AI_VOICE_SEARCH.md](./AI_VOICE_SEARCH.md)
+
+---
+
 ## 📋 Yêu cầu hệ thống
 
 - **Node.js**: v16 trở lên
@@ -145,6 +164,11 @@ Truy cập: **http://localhost:3001** trong trình duyệt
 - Axios 1.13.2
 - Vee-Validate 4.15.1 + Yup 1.7.1
 - Vite 7.1.11
+
+### 🤖 AI Features
+- **Web Speech API** - Speech Recognition (tiếng Việt)
+- **Web Speech API** - Speech Synthesis (Text-to-Speech)
+- **VoiceSearch Component** - Reusable AI component
 
 ---
 

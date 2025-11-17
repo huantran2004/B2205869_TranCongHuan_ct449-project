@@ -1,34 +1,51 @@
 <template>
   <div class="home-container">
     <div class="home-content">
-      <h1><i class="fas fa-book-open"></i> Hệ thống Quản lý Mượn Sách</h1>
-      <p class="subtitle">Chào mừng bạn đến với hệ thống quản lý thư viện</p>
+      <!-- Hero Section -->
+      <div class="hero-section">
+        <i class="fas fa-book-open fa-5x text-white mb-4"></i>
+        <h1 class="display-4 text-white mb-3">📚 Thư viện Trường Đại học</h1>
+        <p class="lead text-white mb-5">Hệ thống mượn sách trực tuyến - Nhanh chóng, tiện lợi</p>
+      </div>
       
-      <div class="login-options">
-        <div class="login-card admin-card" @click="goToAdminLogin">
-          <i class="fas fa-user-shield fa-4x"></i>
-          <h3>Đăng nhập Admin</h3>
-          <p>Quản lý hệ thống, sách, độc giả</p>
-          <button class="btn btn-primary">
-            Đăng nhập <i class="fas fa-arrow-right"></i>
-          </button>
-        </div>
-        
-        <div class="login-card client-card" @click="goToClientLogin">
-          <i class="fas fa-user-circle fa-4x"></i>
-          <h3>Đăng nhập Độc giả</h3>
-          <p>Xem sách, lịch sử mượn trả</p>
-          <button class="btn btn-success">
-            Đăng nhập <i class="fas fa-arrow-right"></i>
+      <!-- Client Login Card -->
+      <div class="client-login-section">
+        <div class="login-card">
+          <i class="fas fa-user-circle fa-4x text-success mb-3"></i>
+          <h3 class="mb-3">Đăng nhập Độc giả</h3>
+          <p class="text-muted mb-4">
+            <i class="fas fa-check-circle text-success"></i> Mượn sách trực tuyến<br>
+            <i class="fas fa-check-circle text-success"></i> Xem lịch sử mượn sách<br>
+            <i class="fas fa-check-circle text-success"></i> Quản lý tài khoản cá nhân
+          </p>
+          <button class="btn btn-success btn-lg px-5" @click="goToClientLogin">
+            <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
           </button>
         </div>
       </div>
       
-      <div class="quick-access">
-        <p>hoặc</p>
-        <router-link to="/" class="btn btn-outline">
-          <i class="fas fa-book"></i> Xem danh sách sách
-        </router-link>
+      <!-- Quick Links -->
+      <div class="quick-links mt-5">
+        <h5 class="text-white mb-4">
+          <i class="fas fa-star"></i> Hoặc khám phá ngay
+        </h5>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <button class="btn btn-outline-light" @click="viewBooks">
+            <i class="fas fa-book"></i> Xem danh sách sách
+          </button>
+          <button class="btn btn-outline-light" @click="showGuide">
+            <i class="fas fa-info-circle"></i> Hướng dẫn sử dụng
+          </button>
+        </div>
+      </div>
+      
+      <!-- Footer Info -->
+      <div class="footer-info mt-5">
+        <p class="text-white-50 small">
+          <i class="fas fa-map-marker-alt"></i> Trường Đại học Cần Thơ<br>
+          <i class="fas fa-phone"></i> Hotline: 0292-xxxx-xxx | 
+          <i class="fas fa-envelope"></i> library@ctu.edu.vn
+        </p>
       </div>
     </div>
   </div>
@@ -36,22 +53,30 @@
 
 <script>
 export default {
+  name: 'HomePage',
   methods: {
-    goToAdminLogin() {
-      this.$router.push({ name: 'admin.login' });
-    },
     goToClientLogin() {
       this.$router.push({ name: 'client.login' });
+    },
+    viewBooks() {
+      // Yêu cầu login để xem sách
+      this.$router.push({ name: 'client.login' });
+    },
+    showGuide() {
+      alert('Hướng dẫn sử dụng:\n\n1. Đăng nhập bằng Mã độc giả và Số điện thoại\n2. Xem danh sách sách\n3. Gửi yêu cầu mượn sách\n4. Theo dõi trạng thái: Chờ duyệt → Đã duyệt → Đã trả\n5. Sử dụng AI Voice Search để tìm sách bằng giọng nói!');
     }
   },
   created() {
-    // Redirect nếu đã đăng nhập
+    // Auto redirect nếu đã đăng nhập
     const userType = localStorage.getItem('userType');
     if (userType === 'admin') {
+      // Admin đã login → redirect về admin dashboard
       this.$router.push({ name: 'admin.dashboard' });
     } else if (userType === 'client') {
+      // Client đã login → redirect về client dashboard
       this.$router.push({ name: 'client.dashboard' });
     }
+    // Nếu chưa login → giữ nguyên HomePage (public landing page for clients)
   }
 };
 </script>
@@ -68,93 +93,114 @@ export default {
 
 .home-content {
   text-align: center;
-  max-width: 1000px;
+  max-width: 900px;
+  width: 100%;
 }
 
-.home-content h1 {
-  color: white;
-  font-size: 3rem;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.subtitle {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1.2rem;
+/* Hero Section */
+.hero-section {
   margin-bottom: 50px;
 }
 
-.login-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-bottom: 40px;
+.hero-section h1 {
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section p {
+  font-size: 1.25rem;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Client Login Section */
+.client-login-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
 }
 
 .login-card {
   background: white;
-  border-radius: 15px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: all 0.3s;
+  border-radius: 20px;
+  padding: 50px 60px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+  max-width: 450px;
+  width: 100%;
+  transition: all 0.3s ease;
 }
 
 .login-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-}
-
-.admin-card i {
-  color: #667eea;
-}
-
-.client-card i {
-  color: #56ab2f;
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 .login-card h3 {
-  margin: 20px 0 10px;
   color: #333;
+  font-weight: 600;
 }
 
 .login-card p {
   color: #666;
-  margin-bottom: 25px;
 }
 
-.quick-access {
-  margin-top: 40px;
-}
-
-.quick-access p {
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 15px;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px solid white;
-  color: white;
-  padding: 12px 30px;
+.login-card .btn {
+  padding: 12px 40px;
+  font-size: 1.1rem;
   border-radius: 25px;
-  text-decoration: none;
-  display: inline-block;
   transition: all 0.3s;
 }
 
-.btn-outline:hover {
-  background: white;
-  color: #667eea;
+.login-card .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
 }
 
+/* Quick Links */
+.quick-links h5 {
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.quick-links .btn-outline-light {
+  padding: 10px 25px;
+  border-radius: 20px;
+  transition: all 0.3s;
+  margin: 0 10px;
+}
+
+.quick-links .btn-outline-light:hover {
+  background: white;
+  color: #667eea;
+  transform: translateY(-2px);
+}
+
+/* Footer Info */
+.footer-info {
+  font-size: 0.9rem;
+}
+
+.footer-info i {
+  margin: 0 5px;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .home-content h1 {
+  .hero-section h1 {
     font-size: 2rem;
   }
   
-  .login-options {
-    grid-template-columns: 1fr;
+  .hero-section p {
+    font-size: 1rem;
+  }
+  
+  .login-card {
+    padding: 40px 30px;
+  }
+  
+  .quick-links .btn-outline-light {
+    display: block;
+    margin: 10px auto;
+    width: 80%;
   }
 }
 </style>

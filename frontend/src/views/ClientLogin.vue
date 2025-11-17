@@ -46,11 +46,7 @@
         </button>
       </Form>
 
-      <div class="login-footer">
-        <p>Bạn là quản trị viên? 
-          <router-link to="/admin/login">Đăng nhập tại đây</router-link>
-        </p>
-      </div>
+      <!-- XÓA link admin để bảo mật -->
     </div>
   </div>
 </template>

@@ -14,7 +14,7 @@
                 type="text"
                 class="form-control"
                 v-model="searchText"
-                placeholder="Tìm kiếm sách theo tên, tác giả..."
+                placeholder="Tìm kiếm sách theo tên, tác giả... hoặc dùng giọng nói"
                 @input="handleSearch"
               />
               <div class="input-group-append">
@@ -22,6 +22,18 @@
                   <i class="fas fa-search"></i>
                 </span>
               </div>
+            </div>
+            
+            <!-- AI Voice Search -->
+            <div class="mt-3">
+              <VoiceSearch 
+                @search="handleVoiceSearch"
+                @transcript-change="handleTranscriptChange"
+                :auto-search="true"
+                lang="vi-VN"
+                idle-text="🎤 Tìm bằng giọng nói (AI)"
+                listening-text="🎙️ Đang nghe..."
+              />
             </div>
           </div>
           <div class="col-md-4">
@@ -88,9 +100,13 @@
 <script>
 import SachService from '@/services/sach.service';
 import TheoDoiMuonSachService from '@/services/theodoimuonsach.service';
+import VoiceSearch from '@/components/VoiceSearch.vue';
 
 export default {
   name: 'ClientBookList',
+  components: {
+    VoiceSearch,
+  },
   data() {
     return {
       books: [],
@@ -174,6 +190,18 @@ export default {
           alert('Có lỗi xảy ra: ' + (error.response?.data?.message || error.message));
         }
       }
+    },
+    
+    // AI Voice Search Methods
+    handleVoiceSearch(transcript) {
+      // Update search text with voice transcript
+      this.searchText = transcript;
+      this.handleSearch();
+    },
+    
+    handleTranscriptChange(transcript) {
+      // Optional: Update search text as user speaks
+      this.searchText = transcript;
     },
   },
 };
