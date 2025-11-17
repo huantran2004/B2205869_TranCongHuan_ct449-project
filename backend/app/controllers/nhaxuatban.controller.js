@@ -45,10 +45,14 @@ exports.update = async (req, res, next) => {
   try {
     const nxbService = new NhaXuatBanService(MongoDB.client);
     const document = await nxbService.update(req.params.id, req.body);
-    if (!document) return next(new ApiError(404, "Nha xuat ban not found"));
-    return res.send({ message: "Nha xuat ban was updated successfully" });
+    // Luôn trả về success message vì nếu có lỗi sẽ throw exception
+    return res.send({ 
+      message: "Nha xuat ban was updated successfully",
+      data: document
+    });
   } catch (error) {
-    return next(new ApiError(500, `Error updating nha xuat ban with id=${req.params.id}`));
+    console.error("Update nha xuat ban error:", error);
+    return next(new ApiError(400, error.message || `Error updating nha xuat ban with id=${req.params.id}`));
   }
 };
 

@@ -63,13 +63,21 @@ class TheoDoiMuonSachService {
 
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const currentRecord = await this.TheoDoiMuonSach.findOne(filter);
+    
+    if (!currentRecord) {
+      throw new Error("Không tìm thấy bản ghi theo dõi mượn sách");
+    }
+    
     const update = this.extractTheoDoiMuonSachData(payload);
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
       filter,
       { $set: update },
       { returnDocument: "after" }
     );
-    return result.value;
+    
+    // Trả về document đã update hoặc currentRecord nếu không có result
+    return result.value || result || currentRecord;
   }
 
   async delete(id) {

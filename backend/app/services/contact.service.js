@@ -78,6 +78,12 @@ class DocGiaService {
 
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const currentDocGia = await this.DocGia.findOne(filter);
+    
+    if (!currentDocGia) {
+      throw new Error("Không tìm thấy độc giả");
+    }
+    
     const update = this.extractDocGiaData(payload);
     
     // Không update Password nếu không được gửi lên (giữ nguyên password cũ)
@@ -90,7 +96,9 @@ class DocGiaService {
       { $set: update },
       { returnDocument: "after" }
     );
-    return result.value;
+    
+    // Trả về document đã update hoặc currentDocGia nếu không có result
+    return result.value || result || currentDocGia;
   }
 
   async delete(id) {

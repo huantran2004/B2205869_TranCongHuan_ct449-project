@@ -58,10 +58,14 @@ exports.update = async (req, res, next) => {
   try {
     const nhanVienService = new NhanVienService(MongoDB.client);
     const document = await nhanVienService.update(req.params.id, req.body);
-    if (!document) return next(new ApiError(404, "Nhan vien not found"));
-    return res.send({ message: "Nhan vien was updated successfully" });
+    // Luôn trả về success message vì nếu có lỗi sẽ throw exception
+    return res.send({ 
+      message: "Nhan vien was updated successfully",
+      data: document
+    });
   } catch (error) {
-    return next(new ApiError(500, `Error updating nhan vien with id=${req.params.id}`));
+    console.error("Update nhan vien error:", error);
+    return next(new ApiError(400, error.message || `Error updating nhan vien with id=${req.params.id}`));
   }
 };
 

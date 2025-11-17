@@ -48,10 +48,14 @@ exports.update = async (req, res, next) => {
   try {
     const docGiaService = new DocGiaService(MongoDB.client);
     const document = await docGiaService.update(req.params.id, req.body);
-    if (!document) return next(new ApiError(404, "Doc gia not found"));
-    return res.send({ message: "Doc gia was updated successfully" });
+    // Luôn trả về success message vì nếu có lỗi sẽ throw exception
+    return res.send({ 
+      message: "Doc gia was updated successfully",
+      data: document
+    });
   } catch (error) {
-    return next(new ApiError(500, `Error updating doc gia with id=${req.params.id}`));
+    console.error("Update doc gia error:", error);
+    return next(new ApiError(400, error.message || `Error updating doc gia with id=${req.params.id}`));
   }
 };
 

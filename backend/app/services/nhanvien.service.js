@@ -71,6 +71,12 @@ class NhanVienService {
 
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const currentNhanVien = await this.NhanVien.findOne(filter);
+    
+    if (!currentNhanVien) {
+      throw new Error("Không tìm thấy nhân viên");
+    }
+    
     const update = this.extractNhanVienData(payload);
     
     // Không xóa password nếu không được cung cấp
@@ -83,7 +89,9 @@ class NhanVienService {
       { $set: update },
       { returnDocument: "after" }
     );
-    return result.value;
+    
+    // Trả về document đã update hoặc currentNhanVien nếu không có result
+    return result.value || result || currentNhanVien;
   }
 
   async delete(id) {

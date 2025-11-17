@@ -49,13 +49,21 @@ class NhaXuatBanService {
 
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    const currentNXB = await this.NhaXuatBan.findOne(filter);
+    
+    if (!currentNXB) {
+      throw new Error("Không tìm thấy nhà xuất bản");
+    }
+    
     const update = this.extractNhaXuatBanData(payload);
     const result = await this.NhaXuatBan.findOneAndUpdate(
       filter,
       { $set: update },
       { returnDocument: "after" }
     );
-    return result.value;
+    
+    // Trả về document đã update hoặc currentNXB nếu không có result
+    return result.value || result || currentNXB;
   }
 
   async delete(id) {
