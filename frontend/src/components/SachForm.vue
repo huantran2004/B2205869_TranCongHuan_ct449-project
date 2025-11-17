@@ -179,6 +179,7 @@ export default {
         this.nhaXuatBans = await NhaXuatBanService.getAll();
       } catch (error) {
         console.error('Lỗi khi tải danh sách NXB:', error);
+        // Không hiển thị lỗi cho user vì không ảnh hưởng đến chức năng chính
       }
     },
     submitSach() {

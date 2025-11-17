@@ -145,7 +145,9 @@ class SachService {
       { $set: update },
       { returnDocument: "after" }
     );
-    return result.value;
+    
+    // Trả về document đã update hoặc currentSach nếu không có result
+    return result.value || result || currentSach;
   }
 
   async delete(id) {

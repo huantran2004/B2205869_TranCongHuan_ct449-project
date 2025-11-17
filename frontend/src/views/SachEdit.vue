@@ -48,12 +48,22 @@ export default {
           await SachService.update(this.sach._id, data);
           this.message = "Sách được cập nhật thành công.";
         }
+        // Navigate sau khi thành công
         setTimeout(() => {
           this.$router.push({ name: "admin.sach" });
         }, 1000);
       } catch (error) {
-        console.log(error);
-        this.message = "Có lỗi xảy ra: " + error.message;
+        console.error('Lỗi khi lưu sách:', error);
+        if (error.response) {
+          // Lỗi từ server (có response)
+          this.message = "Có lỗi xảy ra: " + (error.response.data?.message || error.message);
+        } else if (error.request) {
+          // Request đã gửi nhưng không nhận được response
+          this.message = "Không thể kết nối đến server";
+        } else {
+          // Lỗi khác
+          this.message = "Có lỗi xảy ra: " + error.message;
+        }
       }
     },
     async deleteSach() {
