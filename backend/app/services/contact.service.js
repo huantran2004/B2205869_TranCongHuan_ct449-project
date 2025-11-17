@@ -58,6 +58,12 @@ class DocGiaService {
   async update(id, payload) {
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
     const update = this.extractDocGiaData(payload);
+    
+    // Không update Password nếu không được gửi lên (giữ nguyên password cũ)
+    if (!payload.Password) {
+      delete update.Password;
+    }
+    
     const result = await this.DocGia.findOneAndUpdate(
       filter,
       { $set: update },

@@ -4,7 +4,7 @@
       <!-- Hero Section -->
       <div class="hero-section">
         <i class="fas fa-book-open fa-5x text-white mb-4"></i>
-        <h1 class="display-4 text-white mb-3">📚 Thư viện Trường Đại học</h1>
+        <h1 class="display-4 text-white mb-3">Thư viện Trường Đại học</h1>
         <p class="lead text-white mb-5">Hệ thống mượn sách trực tuyến - Nhanh chóng, tiện lợi</p>
       </div>
       

@@ -261,21 +261,6 @@ export default {
     ErrorMessage,
   },
   data() {
-    const schema = yup.object({
-      MaDocGia: yup.string().required('Mã độc giả là bắt buộc'),
-      HoLot: yup.string().required('Họ lót là bắt buộc'),
-      Ten: yup.string().required('Tên là bắt buộc'),
-      NgaySinh: yup.date().required('Ngày sinh là bắt buộc'),
-      Phai: yup.number().required('Phái là bắt buộc'),
-      DiaChi: yup.string().required('Địa chỉ là bắt buộc'),
-      DienThoai: yup.string().required('Điện thoại là bắt buộc'),
-      Password: yup.string().when('$isEditing', {
-        is: false,
-        then: (schema) => schema.required('Mật khẩu là bắt buộc').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    });
-
     return {
       docGiaList: [],
       filteredDocGia: [],
@@ -293,8 +278,24 @@ export default {
         Password: '',
       },
       editingId: null,
-      schema,
     };
+  },
+  computed: {
+    schema() {
+      // Dynamic schema based on isEditing
+      return yup.object({
+        MaDocGia: yup.string().required('Mã độc giả là bắt buộc'),
+        HoLot: yup.string().required('Họ lót là bắt buộc'),
+        Ten: yup.string().required('Tên là bắt buộc'),
+        NgaySinh: yup.date().required('Ngày sinh là bắt buộc'),
+        Phai: yup.number().required('Phái là bắt buộc'),
+        DiaChi: yup.string().required('Địa chỉ là bắt buộc'),
+        DienThoai: yup.string().required('Điện thoại là bắt buộc'),
+        Password: this.isEditing 
+          ? yup.string().notRequired()
+          : yup.string().required('Mật khẩu là bắt buộc').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+      });
+    },
   },
   mounted() {
     this.loadDocGia();
@@ -337,6 +338,7 @@ export default {
         DienThoai: '',
         Password: '',
       };
+      // jQuery global (Bootstrap 4)
       window.$('#docGiaModal').modal('show');
     },
     showEditModal(dg) {
@@ -351,6 +353,7 @@ export default {
         DiaChi: dg.DiaChi,
         DienThoai: dg.DienThoai,
       };
+      // jQuery global (Bootstrap 4)
       window.$('#docGiaModal').modal('show');
     },
     async handleSubmit() {
@@ -364,6 +367,7 @@ export default {
           await DocGiaService.create(submitData);
           alert('Thêm độc giả thành công!');
         }
+        // jQuery global để đóng modal (Bootstrap 4)
         window.$('#docGiaModal').modal('hide');
         this.loadDocGia();
       } catch (error) {
