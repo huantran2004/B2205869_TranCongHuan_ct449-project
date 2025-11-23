@@ -44,6 +44,15 @@
           <i class="fas fa-sign-in-alt"></i>
           {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
         </button>
+        
+        <div class="text-center mt-3">
+          <p class="register-link">
+            Chưa có tài khoản? 
+            <router-link to="/client/register" class="text-primary">
+              <i class="fas fa-user-plus"></i> Đăng ký ngay
+            </router-link>
+          </p>
+        </div>
       </Form>
 
       <!-- XÓA link admin để bảo mật -->
@@ -245,6 +254,22 @@ export default {
 }
 
 .login-footer a:hover {
+  text-decoration: underline;
+}
+
+.register-link {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.register-link .text-primary {
+  color: #56ab2f !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link .text-primary:hover {
   text-decoration: underline;
 }
 </style>

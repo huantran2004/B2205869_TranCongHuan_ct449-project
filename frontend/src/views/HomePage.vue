@@ -21,6 +21,12 @@
           <button class="btn btn-success btn-lg px-5" @click="goToClientLogin">
             <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
           </button>
+          <p class="mt-3 text-muted">
+            Chưa có tài khoản? 
+            <a href="#" @click.prevent="goToRegister" class="text-success font-weight-bold">
+              <i class="fas fa-user-plus"></i> Đăng ký ngay
+            </a>
+          </p>
         </div>
       </div>
       
@@ -57,6 +63,9 @@ export default {
   methods: {
     goToClientLogin() {
       this.$router.push({ name: 'client.login' });
+    },
+    goToRegister() {
+      this.$router.push({ name: 'client.register' });
     },
     viewBooks() {
       // Yêu cầu login để xem sách
