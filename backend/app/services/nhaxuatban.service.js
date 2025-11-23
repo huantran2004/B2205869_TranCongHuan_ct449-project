@@ -16,14 +16,33 @@ class NhaXuatBanService {
     return nxb;
   }
 
+  // Auto-generate MaNXB (NXB001, NXB002, NXB003...)
+  async generateMaNXB() {
+    const lastNXB = await this.NhaXuatBan.find()
+      .sort({ MaNXB: -1 })
+      .limit(1)
+      .toArray();
+    
+    if (lastNXB.length === 0) return "NXB001";
+    
+    const lastMa = lastNXB[0].MaNXB;
+    const number = parseInt(lastMa.substring(3)) + 1; // Lấy số sau "NXB"
+    return "NXB" + number.toString().padStart(3, "0"); // NXB001, NXB002, ...
+  }
+
   async create(payload) {
     const nxb = this.extractNhaXuatBanData(payload);
-    const result = await this.NhaXuatBan.findOneAndUpdate(
-      { MaNXB: nxb.MaNXB },
-      { $set: nxb },
-      { returnDocument: "after", upsert: true }
-    );
-    return result.value;
+    
+    // Auto-generate MaNXB nếu không có
+    if (!nxb.MaNXB) {
+      nxb.MaNXB = await this.generateMaNXB();
+    }
+    
+    // Insert document mới
+    await this.NhaXuatBan.insertOne(nxb);
+    
+    // Trả về document vừa tạo
+    return nxb;
   }
 
   async find(filter = {}) {

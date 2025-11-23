@@ -103,18 +103,39 @@ class TheoDoiMuonSachService {
   
   // Duyệt yêu cầu mượn sách (Admin)
   async duyetMuonSach(id) {
+    console.log('duyetMuonSach - ID nhận được:', id);
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    console.log('duyetMuonSach - Filter:', filter);
+    
+    const currentRecord = await this.TheoDoiMuonSach.findOne(filter);
+    console.log('duyetMuonSach - Current record:', currentRecord);
+    
+    if (!currentRecord) {
+      throw new Error("Không tìm thấy bản ghi theo dõi mượn sách");
+    }
+    
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
       filter,
       { $set: { TrangThai: "Đã duyệt" } },
       { returnDocument: "after" }
     );
-    return result.value;
+    console.log('duyetMuonSach - Result:', result);
+    return result.value || result || currentRecord;
   }
   
   // Cập nhật NgayTra khi trả sách (Admin)
   async traSach(id) {
+    console.log('traSach - ID nhận được:', id);
     const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    console.log('traSach - Filter:', filter);
+    
+    const currentRecord = await this.TheoDoiMuonSach.findOne(filter);
+    console.log('traSach - Current record:', currentRecord);
+    
+    if (!currentRecord) {
+      throw new Error("Không tìm thấy bản ghi theo dõi mượn sách");
+    }
+    
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
       filter,
       { 
@@ -125,7 +146,8 @@ class TheoDoiMuonSachService {
       },
       { returnDocument: "after" }
     );
-    return result.value;
+    console.log('traSach - Result:', result);
+    return result.value || result || currentRecord;
   }
 }
 

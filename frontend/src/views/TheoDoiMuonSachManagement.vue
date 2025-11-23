@@ -366,6 +366,8 @@ export default {
       }
     },
     async confirmDuyet(item) {
+      console.log('Duyệt item:', item);
+      console.log('ID:', item._id);
       if (confirm(`Xác nhận duyệt yêu cầu mượn sách "${item.MaSach}" của độc giả ${item.MaDocGia}?`)) {
         try {
           await TheoDoiMuonSachService.duyetMuonSach(item._id);
@@ -373,11 +375,14 @@ export default {
           this.loadAll();
         } catch (error) {
           console.error('Lỗi khi duyệt:', error);
+          console.error('Error response:', error.response);
           alert('Không thể duyệt: ' + (error.response?.data?.message || error.message));
         }
       }
     },
     async confirmTraSach(item) {
+      console.log('Trả sách item:', item);
+      console.log('ID:', item._id);
       if (confirm(`Xác nhận trả sách "${item.MaSach}"?`)) {
         try {
           // Sử dụng endpoint mới để trả sách
@@ -386,6 +391,7 @@ export default {
           this.loadAll();
         } catch (error) {
           console.error('Lỗi khi cập nhật:', error);
+          console.error('Error response:', error.response);
           alert('Không thể cập nhật: ' + (error.response?.data?.message || error.message));
         }
       }

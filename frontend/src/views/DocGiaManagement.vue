@@ -107,16 +107,29 @@
             </button>
           </div>
           <div class="modal-body">
-            <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors }">
+            <Form 
+              @submit="handleSubmit" 
+              :validation-schema="schema" 
+              v-slot="{ errors, meta }"
+              ref="docGiaForm"
+            >
+              <!-- Debug: hiển thị validation errors -->
+              <div v-if="Object.keys(errors).length > 0" class="alert alert-warning">
+                <strong>Lỗi validation:</strong>
+                <ul>
+                  <li v-for="(error, field) in errors" :key="field">{{ field }}: {{ error }}</li>
+                </ul>
+              </div>
+              
               <div class="row">
                 <div class="col-md-6" v-if="isEditing">
                   <div class="form-group">
                     <label>Mã Độc Giả</label>
-                    <input
+                    <Field
+                      name="MaDocGia"
                       type="text"
                       class="form-control"
                       v-model="formData.MaDocGia"
-                      disabled
                       readonly
                     />
                     <small class="form-text text-muted">Mã tự động (không thể sửa)</small>
@@ -298,7 +311,14 @@ export default {
         HoLot: yup.string().required('Họ lót là bắt buộc'),
         Ten: yup.string().required('Tên là bắt buộc'),
         NgaySinh: yup.date().required('Ngày sinh là bắt buộc'),
-        Phai: yup.number().required('Phái là bắt buộc'),
+        Phai: yup.number()
+          .transform((value, originalValue) => {
+            // Transform string rỗng hoặc null thành undefined
+            if (originalValue === '' || originalValue === null) return undefined;
+            return value;
+          })
+          .required('Phái là bắt buộc')
+          .oneOf([0, 1], 'Phái phải là Nam hoặc Nữ'),
         DiaChi: yup.string().required('Địa chỉ là bắt buộc'),
         DienThoai: yup.string().required('Điện thoại là bắt buộc'),
         Password: this.isEditing 
@@ -354,30 +374,51 @@ export default {
     showEditModal(dg) {
       this.isEditing = true;
       this.editingId = dg._id;
+      
+      // Chuyển đổi Phai sang number an toàn
+      let phaiValue = dg.Phai;
+      if (typeof phaiValue === 'string') {
+        // Nếu là string "Nam" hoặc "Nữ"
+        phaiValue = phaiValue.toLowerCase().includes('nữ') ? 1 : 0;
+      } else {
+        // Nếu là number, đảm bảo là 0 hoặc 1
+        phaiValue = parseInt(phaiValue) === 1 ? 1 : 0;
+      }
+      
       this.formData = {
         MaDocGia: dg.MaDocGia,
         HoLot: dg.HoLot,
         Ten: dg.Ten,
         NgaySinh: dg.NgaySinh ? dg.NgaySinh.split('T')[0] : '',
-        Phai: dg.Phai,
+        Phai: phaiValue,
         DiaChi: dg.DiaChi,
         DienThoai: dg.DienThoai,
+        Password: '', // Thêm password rỗng (sẽ bị xóa khi submit)
       };
+      console.log('Opening edit modal for:', dg.MaDocGia, 'ID:', this.editingId, 'Phai:', this.formData.Phai);
       // jQuery global (Bootstrap 4)
       window.$('#docGiaModal').modal('show');
     },
     async handleSubmit() {
       try {
         const submitData = { ...this.formData };
+        // Đảm bảo Phai là number
+        submitData.Phai = parseInt(submitData.Phai);
+        
+        console.log('Submitting...', { isEditing: this.isEditing, editingId: this.editingId, submitData });
+        
         if (this.isEditing) {
           // Khi sửa: Xóa Password (giữ nguyên password cũ)
           delete submitData.Password;
-          await DocGiaService.update(this.editingId, submitData);
+          console.log('Calling update with ID:', this.editingId);
+          const result = await DocGiaService.update(this.editingId, submitData);
+          console.log('Update result:', result);
           alert('Cập nhật độc giả thành công!');
         } else {
           // Khi thêm: Xóa MaDocGia (để backend auto-generate)
           delete submitData.MaDocGia;
           const result = await DocGiaService.create(submitData);
+          console.log('Create result:', result);
           alert(`Thêm độc giả thành công!\nMã độc giả: ${result.MaDocGia}`);
         }
         // jQuery global để đóng modal (Bootstrap 4)

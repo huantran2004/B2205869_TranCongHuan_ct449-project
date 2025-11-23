@@ -102,15 +102,22 @@
           </div>
           <div class="modal-body">
             <Form @submit="handleSubmit" :validation-schema="schema" v-slot="{ errors }">
-              <div class="form-group">
-                <label for="maNXB">Mã NXB <span class="text-danger">*</span></label>
+              <!-- Thông báo auto-generate MaNXB khi thêm mới -->
+              <div class="alert alert-info" v-if="!isEditing">
+                <i class="fas fa-info-circle"></i>
+                Mã nhà xuất bản sẽ được tạo tự động (NXB001, NXB002, ...)
+              </div>
+              
+              <!-- Chỉ hiển thị MaNXB khi đang sửa (readonly) -->
+              <div class="form-group" v-if="isEditing">
+                <label for="maNXB">Mã NXB</label>
                 <Field
                   name="MaNXB"
                   type="text"
                   class="form-control"
                   :class="{ 'is-invalid': errors.MaNXB }"
                   v-model="formData.MaNXB"
-                  :disabled="isEditing"
+                  readonly
                 />
                 <ErrorMessage name="MaNXB" class="invalid-feedback" />
               </div>
@@ -173,12 +180,6 @@ export default {
     ErrorMessage,
   },
   data() {
-    const schema = yup.object({
-      MaNXB: yup.string().required('Mã NXB là bắt buộc'),
-      TenNXB: yup.string().required('Tên NXB là bắt buộc'),
-      DiaChi: yup.string(),
-    });
-
     return {
       nxbList: [],
       filteredNXB: [],
@@ -191,8 +192,19 @@ export default {
         DiaChi: '',
       },
       editingId: null,
-      schema,
     };
+  },
+  computed: {
+    schema() {
+      return yup.object({
+        // MaNXB chỉ bắt buộc khi đang sửa
+        MaNXB: this.isEditing 
+          ? yup.string().required('Mã NXB là bắt buộc')
+          : yup.string().notRequired(),
+        TenNXB: yup.string().required('Tên NXB là bắt buộc'),
+        DiaChi: yup.string(),
+      });
+    },
   },
   mounted() {
     this.loadNXB();
